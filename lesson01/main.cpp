@@ -10,7 +10,6 @@ const int SCREEN_HEIGHT = 480;
 int main()
 {
 	SDL_Window* window = nullptr;
-
 	SDL_Surface* screenSurface = nullptr;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0){
