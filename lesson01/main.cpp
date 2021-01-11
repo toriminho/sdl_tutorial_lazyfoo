@@ -1,5 +1,6 @@
 // https://lazyfoo.net/tutorials/SDL/index.php
 // g++ main.cpp -o game -lsdl2
+// g++ main.cpp -o game -lSDL2
 
 #include <SDL2/SDL.h>
 #include <iostream>
