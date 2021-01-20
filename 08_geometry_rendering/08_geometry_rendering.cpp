@@ -1,14 +1,15 @@
 /*This source code copyrighted by Lazy Foo' Productions (2004-2020)
 and may not be redistributed without written permission.*/
 
-// https://lazyfoo.net/tutorials/SDL/07_texture_loading_and_rendering/index.php
-// g++ 07_texture_loading_and_rendering.cpp -o 07_texture_loading_and_rendering -lSDL2 -lSDL2_image
+// https://lazyfoo.net/tutorials/SDL/08_geometry_rendering/index.php
+// g++ 08_geometry_rendering.cpp -o 08_geometry_rendering -lSDL2 -lSDL2_image
 
-//Using SDL, SDL_image, standard IO, and strings
+//Using SDL, SDL_image, standard IO, math, and strings
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <string>
+#include <cmath>
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 640;
@@ -31,9 +32,6 @@ SDL_Window* gWindow = NULL;
 
 //The window renderer
 SDL_Renderer* gRenderer = NULL;
-
-//Current displayed texture
-SDL_Texture* gTexture = NULL;
 
 bool init()
 {
@@ -63,7 +61,6 @@ bool init()
 			SCREEN_HEIGHT,
 			SDL_WINDOW_SHOWN
 		);
-
 		if( gWindow == NULL )
 		{
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -102,23 +99,12 @@ bool loadMedia()
 	//Loading success flag
 	bool success = true;
 
-	//Load PNG texture
-	gTexture = loadTexture( "texture.png" );
-	if( gTexture == NULL )
-	{
-		printf( "Failed to load texture image!\n" );
-		success = false;
-	}
-
+	//Nothing to load
 	return success;
 }
 
 void close()
 {
-	//Free loaded image
-	SDL_DestroyTexture( gTexture );
-	gTexture = NULL;
-
 	//Destroy window	
 	SDL_DestroyRenderer( gRenderer );
 	SDL_DestroyWindow( gWindow );
@@ -192,11 +178,53 @@ int main( int argc, char* args[] )
 					}
 				}
 
+				// 以降の引数の16進数はRBGAを表している
+				// 図形の描画方法は、主に
+				// 図形と色を決めて、SDL_Render形状等()で描画する
+				// 全ての描画が終わったら
+				// SDL_RenderPresent( gRenderer );でフロントバッファに表示する
+
+
 				//Clear screen
+				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( gRenderer );
 
-				//Render texture to screen
-				SDL_RenderCopy( gRenderer, gTexture, NULL, NULL );
+				//Render red filled quad
+				SDL_Rect fillRect = {
+					SCREEN_WIDTH / 4,
+					SCREEN_HEIGHT / 4,
+					SCREEN_WIDTH / 2,
+					SCREEN_HEIGHT / 2
+				};
+				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0x00, 0x00, 0xFF );		
+				SDL_RenderFillRect( gRenderer, &fillRect );
+
+				//Render green outlined quad
+				SDL_Rect outlineRect = {
+					SCREEN_WIDTH / 6,
+					SCREEN_HEIGHT / 6,
+					SCREEN_WIDTH * 2 / 3,
+					SCREEN_HEIGHT * 2 / 3
+				};
+				SDL_SetRenderDrawColor( gRenderer, 0x00, 0xFF, 0x00, 0xFF );		
+				SDL_RenderDrawRect( gRenderer, &outlineRect );
+				
+				//Draw blue horizontal line
+				SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0xFF, 0xFF );		
+				SDL_RenderDrawLine(
+					gRenderer,
+					0,
+					SCREEN_HEIGHT / 2,
+					SCREEN_WIDTH,
+					SCREEN_HEIGHT / 2
+				);
+
+				//Draw vertical line of yellow dots
+				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0x00, 0xFF );
+				for( int i = 0; i < SCREEN_HEIGHT; i += 4 )
+				{
+					SDL_RenderDrawPoint( gRenderer, SCREEN_WIDTH / 2, i );
+				}
 
 				//Update screen
 				SDL_RenderPresent( gRenderer );
